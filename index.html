@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ImgNova - AI Powered Image Link Generator</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary-color: #00aaff;
+      --secondary-color: #00ffaa;
+      --dark-bg: #0a0a1a;
+      --glass-bg: rgba(255, 255, 255, 0.07);
+      --border-color: rgba(255, 255, 255, 0.2);
+      --text-primary: #f0f0f0;
+      --text-secondary: #a0a0b0;
+    }
+
+    body {
+      font-family: 'Poppins', sans-serif;
+      text-align: center;
+      padding: 40px 20px;
+      background-color: var(--dark-bg);
+      background-image: 
+        radial-gradient(circle at 15% 50%, rgba(0, 170, 255, 0.2), transparent 30%),
+        radial-gradient(circle at 85% 30%, rgba(0, 255, 170, 0.15), transparent 40%);
+      color: var(--text-primary);
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      overflow-x: hidden;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
+    }
+
+    .header {
+      margin-bottom: 25px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    .logo {
+      font-size: 3.5rem;
+      font-weight: 700;
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      letter-spacing: 1px;
+      text-shadow: 0 0 20px rgba(0, 170, 255, 0.3);
+    }
+
+    .uploader-box {
+      background: var(--glass-bg);
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--border-color);
+      margin-bottom: 40px;
+      animation: fadeInDown 1s ease-out 0.2s;
+      animation-fill-mode: both;
+    }
+
+    h2 { margin-top: 0; font-size: 1.8rem; }
+
+    .upload-area {
+      border: 2px dashed var(--border-color);
+      border-radius: 12px;
+      padding: 30px;
+      cursor: pointer;
+      transition: background-color 0.3s, border-color 0.3s;
+      margin-bottom: 20px;
+    }
+    .upload-area:hover {
+      background-color: rgba(0, 170, 255, 0.1);
+      border-color: var(--primary-color);
+    }
+    .upload-area p { margin: 0; font-size: 1rem; color: var(--text-secondary); }
+    input[type=file] { display: none; }
+
+    .upload-btn {
+      background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+      color: #0a0a1a;
+      padding: 12px 28px;
+      border: none; border-radius: 8px; font-size: 1rem;
+      font-weight: 600; cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .upload-btn:hover {
+      transform: scale(1.05);
+      box-shadow: 0 0 20px var(--primary-color), 0 0 10px var(--secondary-color);
+    }
+
+    #status { margin-top: 20px; font-size: 1rem; min-height: 24px; font-weight: 600; }
+
+    .result-container {
+      margin-top: 15px; position: relative; opacity: 0;
+      transform: translateY(10px);
+      transition: opacity 0.5s ease, transform 0.5s ease;
+    }
+    .result-container.show { opacity: 1; transform: translateY(0); }
+
+    #link-display {
+      width: calc(100% - 30px); background: rgba(0,0,0,0.3);
+      padding: 12px 15px; border-radius: 8px;
+      border: 1px solid var(--border-color); color: var(--primary-color);
+      word-break: break-all; font-size: 0.9rem; text-align: center;
+    }
+    
+    #copyBtn {
+        position: absolute; top: 50%; right: 8px;
+        transform: translateY(-50%); background: none; border: none;
+        color: var(--text-secondary); cursor: pointer; padding: 5px;
+        transition: color 0.2s ease;
+    }
+    #copyBtn:hover { color: var(--primary-color); }
+    
+    .developer-info {
+        background: var(--glass-bg); border: 1px solid var(--border-color);
+        border-radius: 20px; padding: 25px; margin-bottom: 25px; /* Adjusted Margin */
+        backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+        animation: fadeInUp 1s ease-out 0.2s; animation-fill-mode: both;
+    }
+    .dev-profile-pic {
+        width: 100px; height: 100px; border-radius: 50%;
+        border: 3px solid var(--primary-color);
+        box-shadow: 0 0 15px var(--primary-color); margin-bottom: 15px;
+        object-fit: cover;
+    }
+    .dev-name {
+        font-size: 1.5rem; font-weight: 700; margin: 0;
+        display: inline-flex; align-items: center; gap: 8px;
+    }
+    .verified-badge { width: 24px; height: 24px; color: #00aaff; }
+    .dev-username { color: var(--text-secondary); font-size: 1rem; margin-top: 5px; margin-bottom: 15px; }
+    .contact-btn {
+        background: transparent; border: 2px solid var(--primary-color);
+        color: var(--primary-color); padding: 8px 20px; border-radius: 50px;
+        text-decoration: none; font-weight: 600;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+    }
+    .contact-btn:hover {
+        background-color: var(--primary-color); color: var(--dark-bg);
+        box-shadow: 0 0 15px var(--primary-color);
+    }
+
+    .about-box {
+        background: var(--glass-bg);
+        padding: 25px;
+        border-radius: 20px;
+        border: 1px solid var(--border-color);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        margin-bottom: 40px;
+        animation: fadeInUp 1s ease-out 0.4s;
+        animation-fill-mode: both;
+    }
+    .about-box h3 { margin: 0 0 10px 0; font-size: 1.5rem; color: var(--text-primary); }
+    .about-box p { color: var(--text-secondary); line-height: 1.6; margin: 0; }
+
+    .footer {
+        animation: fadeInUp 1s ease-out 0.6s;
+        animation-fill-mode: both;
+    }
+
+    .join-btn {
+        background: transparent; border: 2px solid var(--secondary-color);
+        color: var(--secondary-color); padding: 10px 25px; border-radius: 50px;
+        text-decoration: none; font-weight: 600;
+        transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+        display: inline-block; margin-bottom: 20px;
+    }
+    .join-btn:hover {
+        background-color: var(--secondary-color); color: var(--dark-bg);
+        box-shadow: 0 0 15px var(--secondary-color);
+    }
+    
+    .telegram-float {
+        position: fixed; bottom: 25px; right: 25px;
+        background: linear-gradient(135deg, #2AABEE, #229ED9); color: white;
+        padding: 10px 15px; border-radius: 50px; display: flex;
+        align-items: center; gap: 8px; text-decoration: none;
+        box-shadow: 0 4px 15px rgba(0, 170, 255, 0.4); z-index: 1000;
+        transition: transform 0.3s ease; animation: pulse 2s infinite;
+    }
+    .telegram-float:hover { transform: scale(1.1); animation: none; }
+    .telegram-float svg { width: 24px; height: 24px; }
+    .telegram-float span { font-weight: 600; font-size: 0.9rem; }
+    
+    @keyframes pulse {
+        0% { box-shadow: 0 4px 15px rgba(0, 170, 255, 0.4); }
+        50% { box-shadow: 0 4px 25px rgba(0, 170, 255, 0.7); }
+        100% { box-shadow: 0 4px 15px rgba(0, 170, 255, 0.4); }
+    }
+    @keyframes fadeInDown {
+        from { opacity: 0; transform: translateY(-20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes fadeInUp {
+        from { opacity: 0; transform: translateY(20px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <header class="header">
+      <h1 class="logo">ImgNova</h1>
+    </header>
+
+    <main class="uploader-box">
+      <h2>📸 ছবি আপলোড করে লিংক নিন</h2>
+      <div class="upload-area" id="uploadArea">
+        <p>এখানে ছবি টেনে আনুন অথবা ক্লিক করে বেছে নিন</p>
+      </div>
+      <input type="file" id="file" accept="image/*">
+      <button class="upload-btn" onclick="uploadImage()">আপলোড করুন</button>
+      <p id="status"></p>
+      <div class="result-container" id="resultContainer">
+        <input type="text" id="link-display" readonly>
+        <button id="copyBtn" onclick="copyLink()" title="Copy Link">
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+        </button>
+      </div>
+    </main>
+
+    <section class="developer-info">
+      <img src="https://i.ibb.co/zVkVkXFM/1000105973.jpg" alt="Developer Profile" class="dev-profile-pic">
+      <h3 class="dev-name">
+        <span>🦋⎯꯭̽𓆩꯭〭〬Ⓜ𝙃𝙖𝙨𝙤𝙣-⧽⧽‌ 🦋</span>
+        <svg class="verified-badge" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M22.25,12c0,5.66-4.59,10.25-10.25,10.25S1.75,17.66,1.75,12,6.34,1.75,12,1.75,22.25,6.34,22.25,12Zm-11.47-3.44L8.53,10.81l-1.8-1.8a.75.75,0,0,0-1.06,1.06l2.33,2.33a.75.75,0,0,0,1.06,0l5.5-5.5a.75.75,0,0,0-1.06-1.06Z"></path></svg>
+      </h3>
+      <p class="dev-username">@hason_rajaM</p>
+      <a href="https://t.me/hason_rajaM" target="_blank" class="contact-btn">ডেভেলপারের সাথে যোগাযোগ</a>
+    </section>
+
+    <section class="about-box">
+        <h3>আমাদের সম্পর্কে</h3>
+        <p>এটি একটি দ্রুত ও নিরাপদ ইমেজ হোস্টিং প্ল্যাটফর্ম। এখানে ছবি আপলোড করে সহজেই একটি শেয়ারযোগ্য লিংক তৈরি করুন এবং যেকোনো জায়গায় ব্যবহার করুন।</p>
+    </section>
+    
+    <footer class="footer">
+      <a href="https://t.me/Fun2Earn1" target="_blank" class="join-btn">আমাদের গ্রুপে যোগ দিন</a>
+      <p>&copy; 2025 ImgNova. সর্বস্বত্ব সংরক্ষিত।</p>
+    </footer>
+  </div>
+  
+  <a href="https://t.me/Fun2Earn1" target="_blank" class="telegram-float">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M21.8,3.2c-0.4-0.4-1-0.5-1.5-0.1L2.8,11.5c-0.5,0.2-0.8,0.7-0.7,1.2s0.6,0.9,1.2,0.9l5.5,0.7l1.2,5.2 c0.2,0.6,0.7,1,1.3,1c0.1,0,0.2,0,0.3,0c0.6-0.1,1.1-0.5,1.3-1.1l2.9-9.1l5.8-0.7C22,9.6,22.2,9,22,8.4C22.1,8.4,22.1,8.4,22.1,8.4z M10.8,13.6l-0.6,2.6l-0.7-3.4l7.2-5.4L10.8,13.6z"></path></svg>
+    <span>Fun2Earn1</span>
+  </a>
+
+  <script>
+    const uploadArea = document.getElementById('uploadArea');
+    const fileInput = document.getElementById('file');
+    const status = document.getElementById('status');
+    const resultContainer = document.getElementById('resultContainer');
+    const linkDisplay = document.getElementById('link-display');
+    const copyBtn = document.getElementById('copyBtn');
+
+    uploadArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('change', () => {
+      if (fileInput.files.length > 0) {
+        uploadArea.querySelector('p').textContent = `নির্বাচিত ফাইল: ${fileInput.files[0].name}`;
+      }
+    });
+    
+    async function uploadImage() {
+      if (!fileInput.files[0]) {
+        alert("দয়া করে প্রথমে একটি ছবি নির্বাচন করুন!");
+        return;
+      }
+
+      status.textContent = "আপলোড হচ্ছে...";
+      resultContainer.classList.remove('show');
+
+      const apiKey = "dbcbf07daac8498f60e493b0993cec3f"; // <-- আপনার ImgBB API key এখানে দিন
+      const formData = new FormData();
+      formData.append("image", fileInput.files[0]);
+
+      try {
+        const res = await fetch(`https://api.imgbb.com/1/upload?key=${apiKey}`, {
+          method: "POST",
+          body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+          status.textContent = "✅ সফলভাবে আপলোড হয়েছে!";
+          linkDisplay.value = data.data.url;
+          resultContainer.classList.add('show');
+        } else {
+          status.textContent = `❌ আপলোড ব্যর্থ হয়েছে: ${data.error.message}`;
+        }
+      } catch (error) {
+        status.textContent = "❌ একটি নেটওয়ার্ক সমস্যা হয়েছে।";
+      }
+    }
+
+    function copyLink() {
+      navigator.clipboard.writeText(linkDisplay.value).then(() => {
+        const originalContent = copyBtn.innerHTML;
+        copyBtn.innerHTML = '<span style="color: var(--secondary-color); font-size: 0.8rem; font-weight:600;">কপি হয়েছে!</span>';
+        setTimeout(() => { copyBtn.innerHTML = originalContent; }, 2000);
+      }).catch(err => { alert('লিংক কপি করা যায়নি।'); });
+    }
+  </script>
+
+</body>
+</html>
